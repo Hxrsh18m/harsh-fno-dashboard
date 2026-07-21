@@ -1,0 +1,21 @@
+# ---- NEVER upload these (secrets / credentials) ----
+angel_secure.bin
+.streamlit/secrets.toml
+secrets.toml
+users.json
+
+# ---- logs / temp ----
+*.log
+dash_run.log
+dash_err.log
+__pycache__/
+*.pyc
+
+# ---- heavy data / local-only (not needed by the live app; it uses Yahoo) ----
+data/
+data_5m/
+_old_backtest_backup/
+secure_creds.py
+equity_curve.csv
+signal_log.json
+daily_*.csv
