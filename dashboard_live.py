@@ -551,6 +551,22 @@ st.markdown("""
 .ml-fill2{height:100%;border-radius:6px;transition:width .25s ease;
  background:linear-gradient(90deg,#00d69e,#4aa8ff);box-shadow:0 0 10px rgba(0,214,158,.5);}
 .ml-pct{color:#e8ecf5;font-weight:800;font-variant-numeric:tabular-nums;}
+/* The page header is hidden — but keep the sidebar EXPAND button visible & obvious,
+   so when the sidebar is collapsed you can always reopen it. (Streamlit 1.59 ids.) */
+[data-testid="stExpandSidebarButton"]{
+  visibility:visible!important;opacity:1!important;display:inline-flex!important;
+  z-index:2147483647!important;}
+[data-testid="stExpandSidebarButton"] svg{
+  width:30px!important;height:30px!important;
+  color:#fff!important;fill:#fff!important;stroke:#fff!important;}
+button[data-testid="stExpandSidebarButton"],
+[data-testid="stExpandSidebarButton"]>button{
+  width:48px!important;height:48px!important;border-radius:12px!important;
+  background:#00d69e!important;border:2px solid #fff!important;
+  box-shadow:0 6px 18px rgba(0,0,0,.55)!important;}
+/* make the collapse (close) arrow inside the sidebar bigger & white too */
+[data-testid="stSidebarCollapseButton"] svg{
+  width:26px!important;height:26px!important;color:#fff!important;fill:#fff!important;stroke:#fff!important;}
 </style>
 """, unsafe_allow_html=True)
 
