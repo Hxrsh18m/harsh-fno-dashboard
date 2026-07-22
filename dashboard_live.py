@@ -54,18 +54,25 @@ def _admin_password():
     return os.environ.get("APP_PASSWORD", "")
 
 def load_users():
+    # users.json only holds ADDITIONAL users created via the admin panel.
+    users = {}
     if os.path.exists(USERS_FILE):
         try:
-            return json.load(open(USERS_FILE, encoding="utf-8"))
+            users = json.load(open(USERS_FILE, encoding="utf-8"))
         except Exception:
-            pass
-    users = {SUPERADMIN: {"password": _admin_password(), "role": "superadmin", "modules": ALL_MODULES}}
-    save_users(users)
+            users = {}
+    # The superadmin password is ALWAYS authoritative from Secrets/env — never a
+    # stale on-disk copy — so setting the [auth] password Secret always takes effect.
+    su = dict(users.get(SUPERADMIN, {}))
+    su.update({"password": _admin_password(), "role": "superadmin", "modules": ALL_MODULES})
+    users[SUPERADMIN] = su
     return users
 
 def save_users(u):
+    # Never persist the superadmin's real password to disk — it lives only in Secrets.
     try:
-        json.dump(u, open(USERS_FILE, "w", encoding="utf-8"), indent=2)
+        out = {k: (dict(v, password="") if k == SUPERADMIN else v) for k, v in u.items()}
+        json.dump(out, open(USERS_FILE, "w", encoding="utf-8"), indent=2)
     except Exception:
         pass
 
