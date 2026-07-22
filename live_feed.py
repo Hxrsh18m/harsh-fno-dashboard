@@ -27,6 +27,29 @@ def _yt(sym):
     return _YT_OVERRIDES.get(sym.upper(), f"{sym}.NS")
 
 
+_SCRIP_URL = "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json"
+
+def _load_scrip_master(timeout=120):
+    """Angel's full NSE instrument dump is ~32MB and downloads slowly (~100s).
+    Cache it to disk for the day so reconnects are instant, not a fresh 100s download."""
+    import os, tempfile, json, time as _t, urllib.request
+    cache = os.path.join(tempfile.gettempdir(), "angel_scrip_master.json")
+    try:
+        if os.path.exists(cache) and (_t.time() - os.path.getmtime(cache)) < 86400 \
+                and os.path.getsize(cache) > 1_000_000:
+            with open(cache, "rb") as f:
+                return json.loads(f.read().decode())
+    except Exception:
+        pass
+    data = urllib.request.urlopen(_SCRIP_URL, timeout=timeout).read()
+    try:
+        with open(cache, "wb") as f:
+            f.write(data)
+    except Exception:
+        pass
+    return json.loads(data.decode())
+
+
 class LiveFeed:
     def __init__(self):
         self._thread = None
@@ -282,9 +305,9 @@ class LiveFeed:
             auth_token = sess["data"]["jwtToken"]
             feed_token = obj.getfeedToken()
 
-            # --- map our symbols -> NSE instrument tokens via the scrip master ---
-            url = "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json"
-            master = _json.loads(urllib.request.urlopen(url, timeout=45).read().decode())
+            # --- map our symbols -> NSE instrument tokens via the scrip master (cached to disk) ---
+            self.status = "connecting: loading instruments (first time ~1-2 min)…"
+            master = _load_scrip_master()
             by_eq = {}
             for it in master:
                 if it.get("exch_seg") != "NSE":
