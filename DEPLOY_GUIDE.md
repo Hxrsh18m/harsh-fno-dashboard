@@ -7,11 +7,14 @@ Total time: about 10–15 minutes, all done by clicking in your web browser.
 Your files are in this folder:
 `C:\Users\harsh\OneDrive\Desktop\Python Dashboard FnO`
 
-**🔒 The app now has a login.** Anyone who opens the link must enter:
-- **Username:** `Hxrsh`
-- **Password:** `hxrsh18fno`
-
-(To change it later, see the last section of this guide.)
+**🔒 The app has a login.** The password is NOT stored in the code — it is read from
+Streamlit **Secrets**, so this repo can safely be public. Set it at deploy time:
+in Streamlit Cloud → **Advanced settings → Secrets**, add:
+```toml
+[auth]
+password = "your_password_here"
+```
+Then sign in with **Username:** `Hxrsh` and that password. (See the last section to change it.)
 
 ---
 
@@ -93,17 +96,14 @@ Your files are in this folder:
 - In the app sidebar pick **"Zerodha Kite (real WebSocket)"**.
   (Note: a Kite access token must be refreshed daily — that's a Zerodha rule, not the app.)
 
-**Change the login username / password later (two easy ways)**
-- *Quick way:* open `dashboard_live.py`, find the line
-  `USER, PW = "Hxrsh", "hxrsh18fno"`, change the values, re-upload the file to GitHub.
-- *Private way (password not stored in code):* in Streamlit Cloud → app **Settings** →
-  **Secrets**, paste:
+**Change the login password later**
+- In Streamlit Cloud → app **Settings** → **Secrets**, edit:
   ```
   [auth]
-  username = "Hxrsh"
-  password = "hxrsh18fno"
+  password = "your_new_password"
   ```
-  The app automatically uses Secrets when present. (This is the safest option.)
+  The app reads the password from Secrets (never from the code), so nothing is exposed
+  even though the repo is public. The username is `Hxrsh`.
 
 **Reminder:** the app link is protected by the login above, so only people with the
 username + password can use it. The dashboard shows public market data + a demo strategy.

@@ -42,13 +42,24 @@ ALL_MODULES = ["Active", "Near", "Watchlist", "Closed", "Charts", "Success", "Al
 USERS_FILE = "users.json"
 SUPERADMIN = "Hxrsh"
 
+def _admin_password():
+    # Superadmin password comes from Streamlit Secrets ([auth] password) or the
+    # APP_PASSWORD env var — never committed in the code, so the repo can be public.
+    try:
+        p = st.secrets.get("auth", {}).get("password")
+        if p:
+            return str(p)
+    except Exception:
+        pass
+    return os.environ.get("APP_PASSWORD", "")
+
 def load_users():
     if os.path.exists(USERS_FILE):
         try:
             return json.load(open(USERS_FILE, encoding="utf-8"))
         except Exception:
             pass
-    users = {SUPERADMIN: {"password": "hxrsh18fno", "role": "superadmin", "modules": ALL_MODULES}}
+    users = {SUPERADMIN: {"password": _admin_password(), "role": "superadmin", "modules": ALL_MODULES}}
     save_users(users)
     return users
 
@@ -83,7 +94,7 @@ def require_login():
             ok = st.form_submit_button("Log in")
         if ok:
             rec = users.get(u)
-            if rec and str(rec.get("password")) == p:
+            if rec and rec.get("password") and str(rec.get("password")) == p:
                 st.session_state["authed"] = True
                 st.session_state["user"] = u
                 st.session_state["role"] = rec.get("role", "user")
