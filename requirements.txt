@@ -4,8 +4,8 @@ pandas
 numpy
 plotly
 streamlit-autorefresh
-# --- optional: uncomment ONLY if you use the Angel One live feed (default Yahoo needs none of these) ---
-# smartapi-python
-# pyotp
-# logzero
-# websocket-client
+# --- Angel One live feed (this app streams live ticks via Angel SmartAPI) ---
+smartapi-python
+pyotp
+logzero
+websocket-client
